@@ -6,7 +6,6 @@ import { hashPassword, comparePassword, signToken, generateVerificationToken, ve
 import { sendVerificationEmail } from '@/lib/email'
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
-import { Resend } from 'resend'
 
 export async function register(prevState: any, formData: FormData) {
     const email = formData.get('email') as string

@@ -1,16 +1,21 @@
 
-import { Resend } from 'resend';
+import nodemailer from 'nodemailer';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev';
+const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+    },
+});
 
 export async function sendVerificationEmail(email: string, token: string) {
     const confirmLink = `${process.env.NEXT_PUBLIC_APP_URL}/api/auth/verify?token=${token}`;
 
     try {
-        const { data, error } = await resend.emails.send({
-            from: FROM_EMAIL,
-            to: email, // Note: In testing mode with onboarding domain, this must be the account email
+        const info = await transporter.sendMail({
+            from: `"Pablo BarberShop" <${process.env.EMAIL_USER}>`,
+            to: email,
             subject: 'Verifica tu cuenta - Pablo BarberShop',
             html: `
         <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
@@ -22,40 +27,36 @@ export async function sendVerificationEmail(email: string, token: string) {
       `,
         });
 
-        if (error) {
-            console.error('Error sending email:', error);
-            return { success: false, error };
-        }
-
-        return { success: true, data };
+        console.log('Message sent: %s', info.messageId);
+        return { success: true, data: info };
     } catch (err) {
-        console.error('Unexpected error sending email:', err);
+        console.error('Error sending email:', err);
         return { success: false, error: err };
     }
 }
 
 export async function sendBookingConfirmationEmail(email: string, bookingDetails: any, token: string) {
-    // Similar logic for booking confirmation
-    // Link to /api/bookings/confirm?token=...
     const confirmLink = `${process.env.NEXT_PUBLIC_APP_URL}/api/bookings/confirm?token=${token}`;
 
     try {
-        await resend.emails.send({
-            from: FROM_EMAIL,
+        const info = await transporter.sendMail({
+            from: `"Pablo BarberShop" <${process.env.EMAIL_USER}>`,
             to: email,
             subject: 'Confirma tu cita - Pablo BarberShop',
             html: `
-                <div style="font-family: sans-serif;">
-                    <h1>Confirma tu Reserva</h1>
-                    <p>Has solicitado una cita para el ${new Date(bookingDetails.start_time).toLocaleString()}.</p>
-                    <p>Para confirmar, haz clic abajo:</p>
-                    <a href="${confirmLink}" style="background: #000; color: #fff; padding: 10px 20px;">Confirmar Cita</a>
-                </div>
-            `
+        <div style="font-family: sans-serif;">
+            <h1>Confirma tu Reserva</h1>
+            <p>Has solicitado una cita para el ${new Date(bookingDetails.start_time).toLocaleString()}.</p>
+            <p>Para confirmar, haz clic abajo:</p>
+            <a href="${confirmLink}" style="background: #000; color: #fff; padding: 10px 20px;">Confirmar Cita</a>
+        </div>
+      `,
         });
+
+        console.log('Message sent: %s', info.messageId);
         return { success: true };
     } catch (error) {
-        console.error(error);
-        return { success: false };
+        console.error('Error sending booking email:', error);
+        return { success: false, error };
     }
 }
