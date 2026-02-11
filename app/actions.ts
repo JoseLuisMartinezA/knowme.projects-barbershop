@@ -12,9 +12,9 @@ import { deleteEvent } from '@/lib/google'
 import { revalidatePath } from 'next/cache'
 
 export type ActionState = {
-    success?: boolean;
-    error?: string;
-    message?: string;
+    success: boolean;
+    error: string | null;
+    message: string | null;
 };
 
 export async function register(prevState: ActionState, formData: FormData): Promise<ActionState> {
@@ -23,7 +23,7 @@ export async function register(prevState: ActionState, formData: FormData): Prom
     const fullName = formData.get('fullName') as string
 
     if (!email || !password || !fullName) {
-        return { error: 'Todos los campos son obligatorios', success: false, message: '' }
+        return { error: 'Todos los campos son obligatorios', success: false, message: null }
     }
 
     // Check existing user
@@ -35,7 +35,7 @@ export async function register(prevState: ActionState, formData: FormData): Prom
     if (result.rows.length > 0) {
         const existingUser = result.rows[0];
         if (existingUser.email_verified) {
-            return { error: 'El usuario ya existe', success: false, message: '' };
+            return { error: 'El usuario ya existe', success: false, message: null };
         }
         // If exists but not verified, delete it so we can re-register clean
         await db.execute({
@@ -71,13 +71,13 @@ export async function register(prevState: ActionState, formData: FormData): Prom
                 ? (emailResult.error as any).message
                 : 'Error al enviar email de verificación';
 
-            return { error: errorMessage, success: false, message: '' };
+            return { error: errorMessage, success: false, message: null };
         }
 
-        return { success: true, message: 'Revisa tu email (incluso SPAM) para verificar la cuenta.', error: '' }
+        return { success: true, message: 'Revisa tu email (incluso SPAM) para verificar la cuenta.', error: null }
     } catch (error) {
         console.error('Registration error:', error)
-        return { error: 'Error al crear la cuenta', success: false, message: '' }
+        return { error: 'Error al crear la cuenta', success: false, message: null }
     }
 }
 
@@ -93,11 +93,11 @@ export async function login(prevState: ActionState, formData: FormData): Promise
     const user = result.rows[0]
 
     if (!user || !await comparePassword(password, user.password_hash as string)) {
-        return { error: 'Credenciales inválidas', success: false }
+        return { error: 'Credenciales inválidas', success: false, message: null }
     }
 
     if (!user.email_verified) {
-        return { error: 'Por favor, verifica tu email primero', success: false }
+        return { error: 'Por favor, verifica tu email primero', success: false, message: null }
     }
 
     // Create session
@@ -248,7 +248,7 @@ export async function resetPassword(prevState: ActionState, formData: FormData):
     const token = formData.get('token') as string;
     const password = formData.get('password') as string;
 
-    if (!token || !password) return { error: 'Faltan datos', success: false };
+    if (!token || !password) return { error: 'Faltan datos', success: false, message: null };
 
     const result = await db.execute({
         sql: 'SELECT id, reset_expires FROM users WHERE reset_token = ?',
@@ -256,14 +256,14 @@ export async function resetPassword(prevState: ActionState, formData: FormData):
     });
 
     if (result.rows.length === 0) {
-        return { error: 'Token inválido o expirado', success: false };
+        return { error: 'Token inválido o expirado', success: false, message: null };
     }
 
     const user = result.rows[0];
     const expires = new Date(user.reset_expires as string);
 
     if (expires < new Date()) {
-        return { error: 'El link ha expirado', success: false };
+        return { error: 'El link ha expirado', success: false, message: null };
     }
 
     const hashedPassword = await hashPassword(password);
@@ -273,7 +273,7 @@ export async function resetPassword(prevState: ActionState, formData: FormData):
         args: [hashedPassword, user.id]
     });
 
-    return { success: true, error: '' };
+    return { success: true, error: null, message: 'Contraseña actualizada' };
 }
 
 import { sendPasswordResetEmail } from '@/lib/email'

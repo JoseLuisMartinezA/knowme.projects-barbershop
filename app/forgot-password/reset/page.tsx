@@ -22,8 +22,9 @@ function SubmitButton() {
 }
 
 const initialState: ActionState = {
-    error: '',
-    success: false
+    error: null,
+    success: false,
+    message: null
 }
 
 function ResetForm() {

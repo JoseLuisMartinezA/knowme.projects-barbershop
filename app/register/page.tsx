@@ -21,9 +21,9 @@ function SubmitButton() {
 }
 
 const initialState: ActionState = {
-    error: '',
+    error: null,
     success: false,
-    message: ''
+    message: null
 }
 
 export default function RegisterPage() {

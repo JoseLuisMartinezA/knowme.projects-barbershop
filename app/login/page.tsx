@@ -22,7 +22,9 @@ function SubmitButton() {
 }
 
 const initialState: ActionState = {
-    error: '',
+    error: null,
+    success: false,
+    message: null
 }
 
 export default function LoginPage() {
