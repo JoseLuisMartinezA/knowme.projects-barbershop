@@ -1,6 +1,6 @@
 
 import { SignJWT, jwtVerify } from 'jose';
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 
 const JWT_SECRET = new TextEncoder().encode(
     process.env.JWT_SECRET || 'fallback_secret_please_change'
