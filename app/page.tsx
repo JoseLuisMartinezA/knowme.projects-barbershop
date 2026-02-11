@@ -61,10 +61,10 @@ export default async function Home() {
           </div>
 
           <Link href="/book" className="group block transform transition-all active:scale-95 duration-300">
-            <div className="flex items-center justify-between p-6 md:p-10 bg-white border border-gray-100 shadow-sm hover:shadow-md hover:bg-gray-50 rounded-[40px] transition-all">
-              <div className="flex items-center space-x-6 md:space-x-12">
-                <div className="w-16 h-16 md:w-32 md:h-32 bg-[#D4A35B] rounded-[24px] md:rounded-[40px] flex items-center justify-center flex-shrink-0 shadow-lg shadow-gold-400/10">
-                  <div className="relative w-10 h-10 md:w-20 md:h-20">
+            <div className="flex items-center justify-between p-4 md:p-10 bg-white border border-gray-100 shadow-sm hover:shadow-md hover:bg-gray-50 rounded-[32px] md:rounded-[40px] transition-all">
+              <div className="flex items-center space-x-4 md:space-x-12">
+                <div className="w-12 h-12 md:w-32 md:h-32 bg-[#D4A35B] rounded-2xl md:rounded-[40px] flex items-center justify-center flex-shrink-0 shadow-lg shadow-gold-400/10">
+                  <div className="relative w-8 h-8 md:w-20 md:h-20">
                     <svg viewBox="0 0 24 24" fill="none" stroke="black" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-full h-full">
                       <circle cx="6" cy="6" r="3" />
                       <circle cx="6" cy="18" r="3" />
@@ -77,13 +77,13 @@ export default async function Home() {
                 </div>
 
                 <div>
-                  <h3 className="text-3xl md:text-6xl font-black text-gray-900 leading-none mb-1 md:mb-4 italic tracking-tighter">Corte de pelo.</h3>
-                  <p className="text-gray-900 text-lg md:text-3xl font-medium tracking-tight opacity-70">Precisión & Estilo</p>
+                  <h3 className="text-xl md:text-6xl font-black text-gray-900 leading-none mb-1 md:mb-4 italic tracking-tighter">Corte de pelo.</h3>
+                  <p className="text-gray-900 text-sm md:text-3xl font-medium tracking-tight opacity-70">Precisión & Estilo</p>
                 </div>
               </div>
 
-              <div className="pr-2 md:pr-10">
-                <span className="text-3xl md:text-7xl font-black text-[#0047AB] tracking-tighter">+7€</span>
+              <div className="pr-1 md:pr-10">
+                <span className="text-2xl md:text-7xl font-black text-[#0047AB] tracking-tighter">+7€</span>
               </div>
             </div>
           </Link>
@@ -98,22 +98,22 @@ export default async function Home() {
           <div className="space-y-12 animate-slide-up">
             <div>
               <span className="text-gold-600 font-black text-[10px] uppercase tracking-[0.5em] mb-4 block">Visítanos</span>
-              <h2 className="text-6xl md:text-9xl font-black text-gray-900 uppercase tracking-tighter leading-[0.8] mb-10">Peluquería <br /> Pablo</h2>
-              <p className="text-gray-500 text-xl md:text-2xl font-medium leading-relaxed max-w-sm">Tu confianza es mi mayor compromiso.</p>
+              <h2 className="text-4xl md:text-9xl font-black text-gray-900 uppercase tracking-tighter leading-[0.8] mb-6">Peluquería <br /> Pablo</h2>
+              <p className="text-gray-500 text-base md:text-2xl font-medium leading-relaxed max-w-sm">Tu confianza es mi mayor compromiso.</p>
             </div>
 
-            <div className="space-y-10">
-              <div className="flex items-center space-x-6">
-                <div className="p-4 bg-white rounded-2xl shadow-sm">
-                  <MapPin className="w-8 h-8 text-gold-600" />
+            <div className="space-y-6">
+              <div className="flex items-center space-x-4">
+                <div className="p-3 bg-white rounded-xl shadow-sm">
+                  <MapPin className="w-5 h-5 text-gold-600" />
                 </div>
-                <p className="text-gray-900 font-bold text-xl md:text-3xl tracking-tight">C. Estilo, 45, Madrid</p>
+                <p className="text-gray-900 font-bold text-base md:text-3xl tracking-tight">C. Estilo, 45, Madrid</p>
               </div>
-              <a href="tel:+34912345678" className="flex items-center space-x-6 group w-fit">
-                <div className="p-4 bg-gold-400 rounded-2xl group-hover:scale-110 transition-transform shadow-lg shadow-gold-400/20">
-                  <Phone className="w-8 h-8 text-white" />
+              <a href="tel:+34912345678" className="flex items-center space-x-4 group w-fit">
+                <div className="p-3 bg-gold-400 rounded-xl group-hover:scale-110 transition-transform shadow-lg shadow-gold-400/20">
+                  <Phone className="w-5 h-5 text-white" />
                 </div>
-                <p className="text-gray-900 font-black text-3xl md:text-5xl tracking-tighter">+34 912 345 678</p>
+                <p className="text-gray-900 font-black text-xl md:text-5xl tracking-tighter">+34 912 345 678</p>
               </a>
             </div>
           </div>

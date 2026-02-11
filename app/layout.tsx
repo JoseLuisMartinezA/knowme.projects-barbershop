@@ -24,6 +24,7 @@ export const metadata: Metadata = {
   description: "Corte de pelo y barba con estilo clásico y técnicas modernas.",
 };
 
+
 export default function RootLayout({
   children,
 }: Readonly<{

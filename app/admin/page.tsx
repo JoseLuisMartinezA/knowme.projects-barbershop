@@ -60,7 +60,7 @@ export default async function AdminPage() {
                             <ShieldCheck className="w-4 h-4" />
                             <span className="text-[9px] font-black uppercase tracking-[0.4em]">ADMIN CONTROL</span>
                         </div>
-                        <h1 className="text-5xl md:text-7xl font-black font-playfair uppercase tracking-tighter text-gray-900 leading-none">Reservas</h1>
+                        <h1 className="text-5xl font-black font-playfair uppercase tracking-tighter text-gray-900 leading-none">Reservas</h1>
                         <p className="text-gray-400 text-sm mt-4 font-black uppercase tracking-widest flex items-center gap-3">
                             <Activity className="w-3 h-3 text-green-500 animate-pulse" />
                             Sincronizado en tiempo real
@@ -84,7 +84,7 @@ export default async function AdminPage() {
                             </div>
                         </div>
                         <div className="text-right">
-                            <span className="text-5xl md:text-7xl font-black text-gold-600 tracking-tighter">{appointments.length}</span>
+                            <span className="text-5xl font-black text-gold-600 tracking-tighter">{appointments.length}</span>
                             <span className="text-[10px] font-black uppercase tracking-widest text-gray-400 block mt-2">Reservas</span>
                         </div>
                     </div>

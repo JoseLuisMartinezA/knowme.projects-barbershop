@@ -47,7 +47,7 @@ export default function BookPage() {
                         <Sparkles className="w-5 h-5" />
                         <span className="text-[10px] font-black uppercase tracking-[0.4em]">Experiencia Premium</span>
                     </div>
-                    <h1 className="text-5xl md:text-7xl font-black font-playfair uppercase tracking-tighter text-gray-900 leading-none">Reserva Tu Cita</h1>
+                    <h1 className="text-5xl font-black font-playfair uppercase tracking-tighter text-gray-900 leading-none">Reserva Tu Cita</h1>
                     <p className="text-gray-400 font-bold uppercase tracking-widest text-[10px] mt-6">Elige el momento perfecto para renovar tu estilo</p>
                 </header>
 
@@ -96,8 +96,8 @@ export default function BookPage() {
                                                 key={slot}
                                                 onClick={() => setSelectedSlot(slot)}
                                                 className={`py-5 rounded-[24px] font-black transition-all text-sm border-2 ${selectedSlot === slot
-                                                        ? 'gold-gradient text-white border-transparent shadow-xl scale-105 z-10'
-                                                        : 'bg-white text-gray-400 border-gray-50 hover:border-gold-200 shadow-sm'
+                                                    ? 'gold-gradient text-white border-transparent shadow-xl scale-105 z-10'
+                                                    : 'bg-white text-gray-400 border-gray-50 hover:border-gold-200 shadow-sm'
                                                     }`}
                                             >
                                                 {slot}hs

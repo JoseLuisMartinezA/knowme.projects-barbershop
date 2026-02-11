@@ -10,6 +10,7 @@ export default function Navbar({ userEmail }: { userEmail?: string | null }) {
     const pathname = usePathname()
     const isAdmin = userEmail === 'peluqueriapablo.contact@gmail.com'
 
+
     // Bottom Navigation Bar
     const BottomNav = (
         <nav className="fixed bottom-0 w-full z-50 bg-white/95 backdrop-blur-xl border-t border-gray-100 pb-safe shadow-[0_-10px_30px_rgba(0,0,0,0.03)]">

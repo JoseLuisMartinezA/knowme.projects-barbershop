@@ -44,7 +44,7 @@ export default function AdminCalendar({ initialAppointments }: { initialAppointm
     return (
         <div className="space-y-8">
             {/* View Switcher & Nav */}
-            <div className="flex flex-col md:flex-row justify-between items-center gap-6 bg-white p-6 rounded-[32px] shadow-sm border border-gray-100">
+            <div className="flex flex-col justify-between items-center gap-6 bg-white p-6 rounded-[32px] shadow-sm border border-gray-100">
                 <div className="flex items-center space-x-8">
                     <button
                         onClick={() => setView(view === 'day' ? 'month' : 'day')}
@@ -53,7 +53,7 @@ export default function AdminCalendar({ initialAppointments }: { initialAppointm
                         {view === 'day' ? <Maximize2 className="w-4 h-4" /> : <Minimize2 className="w-4 h-4" />}
                         <span>{view === 'day' ? 'Mes' : 'Semana'}</span>
                     </button>
-                    <h2 className="text-2xl font-black uppercase tracking-tight text-gray-900 border-l-2 border-gold-400 pl-6 hidden md:block">
+                    <h2 className="text-2xl font-black uppercase tracking-tight text-gray-900 border-l-2 border-gold-400 pl-6">
                         {format(currentDate, 'MMMM yyyy', { locale: es })}
                     </h2>
                 </div>
@@ -85,7 +85,7 @@ export default function AdminCalendar({ initialAppointments }: { initialAppointm
 
             {/* Weekly Navigation Bar (Only in Day View) */}
             {view === 'day' && (
-                <div className="flex md:grid md:grid-cols-7 gap-3 overflow-x-auto pb-2 -mx-2 px-2 scrollbar-hide">
+                <div className="flex gap-3 overflow-x-auto pb-2 -mx-2 px-2 scrollbar-hide">
                     {weekDays.map((day, i) => {
                         const isSelected = isSameDay(day, selectedDate)
                         const hasAppointments = getAppointmentsForDate(day).length > 0
@@ -94,17 +94,17 @@ export default function AdminCalendar({ initialAppointments }: { initialAppointm
                             <button
                                 key={i}
                                 onClick={() => setSelectedDate(day)}
-                                className={`flex flex-col items-center p-4 md:p-6 rounded-[24px] md:rounded-[28px] transition-all relative min-w-[70px] md:min-w-0 flex-shrink-0 ${isSelected
+                                className={`flex flex-col items-center p-4 rounded-[24px] transition-all relative min-w-[70px] flex-shrink-0 ${isSelected
                                     ? 'gold-gradient text-white shadow-[0_10px_20px_rgba(197,160,89,0.3)] scale-105 z-10'
                                     : 'bg-white border border-gray-100 hover:border-gold-200 shadow-sm'
                                     }`}
                             >
-                                <span className={`text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] mb-1 md:mb-2 ${isSelected ? 'text-white/70' : 'text-gray-400'}`}>
+                                <span className={`text-[9px] font-black uppercase tracking-[0.2em] mb-1 ${isSelected ? 'text-white/70' : 'text-gray-400'}`}>
                                     {format(day, 'EEE', { locale: es })}
                                 </span>
-                                <span className="text-lg md:text-2xl font-black">{format(day, 'd')}</span>
+                                <span className="text-lg font-black">{format(day, 'd')}</span>
                                 {hasAppointments && !isSelected && (
-                                    <div className="w-1.5 h-1.5 md:w-2 md:h-2 bg-gold-500 rounded-full mt-2 md:mt-3 shadow-sm" />
+                                    <div className="w-1.5 h-1.5 bg-gold-500 rounded-full mt-2 shadow-sm" />
                                 )}
                             </button>
                         )
@@ -139,14 +139,14 @@ export default function AdminCalendar({ initialAppointments }: { initialAppointm
                                             setSelectedDate(day)
                                             setView('day')
                                         }}
-                                        className={`aspect-square flex flex-col items-center justify-center rounded-xl md:rounded-2xl transition-all relative group ${isSelected ? 'gold-gradient text-white shadow-lg' : 'hover:bg-gray-50 border border-transparent hover:border-gray-100'
+                                        className={`aspect-square flex flex-col items-center justify-center rounded-xl transition-all relative group ${isSelected ? 'gold-gradient text-white shadow-lg' : 'hover:bg-gray-50 border border-transparent hover:border-gray-100'
                                             } ${isToday && !isSelected ? 'border-2 border-gold-400' : ''}`}
                                     >
-                                        <span className={`text-sm md:text-lg font-black ${isSelected ? 'text-white' : 'text-gray-700'}`}>{format(day, 'd')}</span>
+                                        <span className={`text-sm font-black ${isSelected ? 'text-white' : 'text-gray-700'}`}>{format(day, 'd')}</span>
                                         {appointments.length > 0 && (
-                                            <div className={`mt-1 md:mt-2 flex gap-0.5 md:gap-1 justify-center flex-wrap px-1`}>
+                                            <div className={`mt-1 flex gap-0.5 justify-center flex-wrap px-1`}>
                                                 {appointments.slice(0, 3).map((_, idx) => (
-                                                    <div key={idx} className={`w-1 md:w-1.5 h-1 md:h-1.5 rounded-full ${isSelected ? 'bg-white' : 'bg-gold-500'}`} />
+                                                    <div key={idx} className={`w-1 h-1 rounded-full ${isSelected ? 'bg-white' : 'bg-gold-500'}`} />
                                                 ))}
                                             </div>
                                         )}
@@ -159,15 +159,15 @@ export default function AdminCalendar({ initialAppointments }: { initialAppointm
             )}
 
             {/* Detail View (Today's List) */}
-            <div className="animate-slide-up bg-white p-6 md:p-10 rounded-[32px] md:rounded-[40px] border border-gray-100 shadow-sm">
-                <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 md:mb-10 pb-6 border-b border-gray-50 gap-4">
-                    <h3 className="text-lg md:text-xl font-black text-gray-900 uppercase tracking-tight flex items-center space-x-3 md:space-x-4">
-                        <div className="p-2 md:p-3 bg-gold-400 rounded-xl md:rounded-2xl text-white shadow-md">
-                            <CalendarIcon className="w-5 h-5 md:w-6 md:h-6" />
+            <div className="animate-slide-up bg-white p-6 rounded-[32px] border border-gray-100 shadow-sm">
+                <div className="flex flex-col justify-between mb-8 pb-6 border-b border-gray-50 gap-4">
+                    <h3 className="text-lg font-black text-gray-900 uppercase tracking-tight flex items-center space-x-3">
+                        <div className="p-2 bg-gold-400 rounded-xl text-white shadow-md">
+                            <CalendarIcon className="w-5 h-5" />
                         </div>
                         <span className="leading-tight">Citas: {format(selectedDate, 'd MMM', { locale: es })}</span>
                     </h3>
-                    <span className="text-[9px] md:text-[10px] font-black uppercase bg-gray-100 text-gray-500 px-4 py-2 rounded-full tracking-widest w-fit">
+                    <span className="text-[9px] font-black uppercase bg-gray-100 text-gray-500 px-4 py-2 rounded-full tracking-widest w-fit">
                         {selectedAppointments.length} Cita{selectedAppointments.length !== 1 ? 's' : ''}
                     </span>
                 </div>
@@ -185,17 +185,17 @@ export default function AdminCalendar({ initialAppointments }: { initialAppointm
                             .sort((a, b) => new Date(a.start_time).getTime() - new Date(b.start_time).getTime())
                             .map((apt) => (
                                 <div key={apt.id} className="bg-gray-50 p-6 md:p-8 rounded-[24px] md:rounded-[32px] flex flex-col sm:flex-row md:items-center justify-between gap-4 md:gap-6 border border-gray-100 hover:border-gold-300 transition-all group">
-                                    <div className="flex items-center space-x-6 md:space-x-8">
-                                        <div className="flex flex-col items-center justify-center p-4 md:p-5 bg-white rounded-2xl md:rounded-3xl group-hover:bg-gold-400 group-hover:text-white transition-all shadow-sm w-20 md:w-24">
-                                            <span className="text-[8px] md:text-[10px] font-black uppercase tracking-widest opacity-40 mb-1">Hora</span>
-                                            <span className="text-xl md:text-2xl font-black">{format(new Date(apt.start_time), 'HH:mm')}</span>
+                                    <div className="flex items-center space-x-6">
+                                        <div className="flex flex-col items-center justify-center p-4 bg-white rounded-2xl group-hover:bg-gold-400 group-hover:text-white transition-all shadow-sm w-20">
+                                            <span className="text-[8px] font-black uppercase tracking-widest opacity-40 mb-1">Hora</span>
+                                            <span className="text-xl font-black">{format(new Date(apt.start_time), 'HH:mm')}</span>
                                         </div>
                                         <div className="overflow-hidden">
-                                            <div className="flex items-center space-x-2 mb-1 md:mb-2">
-                                                <div className="w-1 h-1 md:w-1.5 md:h-1.5 bg-gold-500 rounded-full" />
-                                                <span className="text-[8px] md:text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Cliente</span>
+                                            <div className="flex items-center space-x-2 mb-1">
+                                                <div className="w-1 h-1 bg-gold-500 rounded-full" />
+                                                <span className="text-[8px] font-black text-gray-400 uppercase tracking-[0.2em]">Cliente</span>
                                             </div>
-                                            <p className="font-black text-lg md:text-2xl text-gray-900 font-playfair truncate">{apt.user_name}</p>
+                                            <p className="font-black text-lg text-gray-900 font-playfair truncate">{apt.user_name}</p>
                                         </div>
                                     </div>
 
