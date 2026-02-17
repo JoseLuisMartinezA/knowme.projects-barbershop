@@ -41,7 +41,6 @@ export async function GET(request: Request) {
 
     // Create Google Calendar Event
     try {
-        // ... (existing code for creating event)
         const event = await createEvent({
             summary: `Cita: ${appointment.customer_name || 'Nuevo Cliente'} - ${staffName}`,
             description: `Cita reservada desde la web.\nCliente: ${appointment.customer_name}\nEmail: ${email}\nBarbero: ${staffName}\nServicios: ${appointment.services}\nNotas: ${appointment.notes}`,
