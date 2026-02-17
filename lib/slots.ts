@@ -28,9 +28,10 @@ export async function getAvailableSlots(dateStr: string, staffId?: string | numb
     // - OR it is 'pending' AND was created less than 10 minutes ago
     const tenMinutesAgo = new Date(Date.now() - 10 * 60 * 1000).toISOString();
 
-    // We use a range check for start_time to be exactly on the requested day
-    const dayStartISO = `${dateStr}T00:00:00.000Z`;
-    const dayEndISO = `${dateStr}T23:59:59.999Z`;
+    // We use a range check for start_time to be exactly on the requested day in local time
+    // This handles timezone offsets correctly when converting to UTC
+    const dayStartISO = startOfDay(date).toISOString();
+    const dayEndISO = endOfDay(date).toISOString();
 
     const tursoResult = await db.execute({
         sql: `
@@ -44,9 +45,10 @@ export async function getAvailableSlots(dateStr: string, staffId?: string | numb
         args: [tenMinutesAgo, dayStartISO, dayEndISO]
     });
 
-    // 3. Get All Real Staff (needed if staffId is not specified or "all")
-    const staffResult = await db.execute("SELECT id FROM staff WHERE name != 'Cualquiera'");
-    const realStaffCount = staffResult.rows.length;
+    // 3. Get All Real Staff
+    const staffResult = await db.execute("SELECT id, name FROM staff");
+    const realStaff = staffResult.rows.filter(s => (s.name as string).toLowerCase() !== 'cualquiera');
+    const realStaffCount = realStaff.length;
 
     // 4. Generate all possible slots
     const slots = [];

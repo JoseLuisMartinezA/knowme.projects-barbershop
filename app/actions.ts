@@ -7,7 +7,7 @@ import { sendVerificationEmail } from '@/lib/email'
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { sendBookingConfirmationEmail } from '@/lib/email'
-import { parse, setHours, setMinutes } from 'date-fns'
+import { parse, setHours, setMinutes, setSeconds, setMilliseconds, startOfDay, addMinutes } from 'date-fns'
 import { deleteEvent } from '@/lib/google'
 import { revalidatePath } from 'next/cache'
 
@@ -140,10 +140,10 @@ export async function bookAppointment(formData: FormData): Promise<ActionState> 
         return { success: false, error: 'Por favor, rellena todos los datos obligatorios.', message: null };
     }
 
-    const date = parse(dateStr, 'yyyy-MM-dd', new Date());
+    const baseDate = startOfDay(parse(dateStr, 'yyyy-MM-dd', new Date()));
     const [hours, minutes] = timeStr.split(':').map(Number);
-    const startTime = setMinutes(setHours(date, hours), minutes);
-    const endTime = setMinutes(setHours(date, hours), minutes + 30); // Default 30 min, should probably use service duration
+    const startTime = setMilliseconds(setSeconds(setMinutes(setHours(baseDate, hours), minutes), 0), 0);
+    const endTime = addMinutes(startTime, 30);
 
     let staffId = staffIdRaw ? parseInt(staffIdRaw) : null;
 
@@ -155,11 +155,11 @@ export async function bookAppointment(formData: FormData): Promise<ActionState> 
             args: [staffId]
         });
 
-        const isAnyStaff = !staffId || staffResult.rows[0]?.name === 'Cualquiera';
+        const isAnyStaff = !staffId || (staffResult.rows[0]?.name as string)?.toLowerCase() === 'cualquiera';
 
         if (isAnyStaff) {
             // Find a real staff member who is free at this time
-            const realStaffResult = await db.execute('SELECT id FROM staff WHERE name != "Cualquiera"');
+            const realStaffResult = await db.execute("SELECT id, name FROM staff WHERE LOWER(name) != 'cualquiera'");
             const realStaffIds = realStaffResult.rows.map(r => r.id as number);
 
             let assignedStaffId = null;
@@ -170,10 +170,11 @@ export async function bookAppointment(formData: FormData): Promise<ActionState> 
                     sql: `
                         SELECT id FROM appointments 
                         WHERE staff_id = ? 
-                        AND start_time = ? 
+                        AND start_time < ? 
+                        AND end_time > ? 
                         AND (status = 'confirmed' OR (status = 'pending' AND created_at > ?))
                     `,
-                    args: [sId, startTime.toISOString(), tenMinutesAgo]
+                    args: [sId, endTime.toISOString(), startTime.toISOString(), tenMinutesAgo]
                 });
                 if (conflict.rows.length === 0) {
                     assignedStaffId = sId;
@@ -192,10 +193,11 @@ export async function bookAppointment(formData: FormData): Promise<ActionState> 
                 sql: `
                     SELECT id FROM appointments 
                     WHERE staff_id = ? 
-                    AND start_time = ? 
+                    AND start_time < ? 
+                    AND end_time > ? 
                     AND (status = 'confirmed' OR (status = 'pending' AND created_at > ?))
                 `,
-                args: [staffId, startTime.toISOString(), tenMinutesAgo]
+                args: [staffId, endTime.toISOString(), startTime.toISOString(), tenMinutesAgo]
             });
             if (conflict.rows.length > 0) {
                 return { success: false, error: 'Este profesional ya tiene una cita reservada a esta hora.', message: null };

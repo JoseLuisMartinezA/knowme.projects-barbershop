@@ -229,6 +229,7 @@ export default function AdminCalendar({ initialAppointments, staff }: { initialA
                                                                 return apt.services;
                                                             }
                                                         })()}
+                                                        {apt.staff_name && ` • Con ${apt.staff_name}`}
                                                     </p>
                                                 </div>
                                             </div>
