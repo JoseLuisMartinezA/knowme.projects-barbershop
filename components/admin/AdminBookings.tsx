@@ -4,6 +4,8 @@ import { useState } from 'react'
 import { Calendar, Clock, User, Scissors, Filter, Mail, Phone, Trash2 } from 'lucide-react'
 import { format } from 'date-fns'
 import { es } from 'date-fns/locale'
+import { cancelAppointment } from '@/app/actions'
+import PrivacyGuard from './PrivacyGuard'
 
 interface Appointment {
     id: number
@@ -39,13 +41,13 @@ export default function AdminBookings({ appointments, staff }: AdminBookingsProp
     const getStatusColor = (status: string) => {
         switch (status) {
             case 'confirmed':
-                return 'bg-green-100 text-green-700 border-green-200'
+                return 'bg-green-50 text-green-700 border-green-100'
             case 'pending':
-                return 'bg-yellow-100 text-yellow-700 border-yellow-200'
+                return 'bg-amber-50 text-amber-700 border-amber-100'
             case 'cancelled':
-                return 'bg-red-100 text-red-700 border-red-200'
+                return 'bg-red-50 text-red-700 border-red-100'
             default:
-                return 'bg-gray-100 text-gray-700 border-gray-200'
+                return 'bg-gray-50 text-gray-700 border-gray-100'
         }
     }
 
@@ -63,27 +65,25 @@ export default function AdminBookings({ appointments, staff }: AdminBookingsProp
     }
 
     return (
-        <div className="space-y-10">
+        <div className="space-y-6">
             {/* Header with Filter */}
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-gray-100 pb-8">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-6 rounded-xl border border-gray-200">
                 <div>
-                    <h2 className="text-4xl font-black tracking-tighter uppercase italic text-gray-900 leading-none mb-2">
-                        Gestión de Citas
+                    <h2 className="text-xl font-bold text-gray-900">
+                        Listado de Citas
                     </h2>
-                    <p className="text-sm text-gray-500 font-bold uppercase tracking-widest">
-                        {filteredAppointments.length} reserva{filteredAppointments.length !== 1 ? 's' : ''} encontrada{filteredAppointments.length !== 1 ? 's' : ''}
+                    <p className="text-xs text-gray-500 font-medium mt-1">
+                        {filteredAppointments.length} reserva{filteredAppointments.length !== 1 ? 's' : ''} en total
                     </p>
                 </div>
 
-                {/* Staff Filter Filter */}
-                <div className="flex flex-col gap-2">
-                    <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-2">Filtrar por Peluquero</label>
-                    <div className="relative group">
-                        <Filter className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-hover:text-gold-500 transition-colors" />
+                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+                    <label className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Barbero:</label>
+                    <div className="relative w-full sm:w-64">
                         <select
                             value={selectedStaff}
                             onChange={(e) => setSelectedStaff(e.target.value)}
-                            className="pl-12 pr-10 py-4 bg-gray-50 border-2 border-transparent rounded-[1.5rem] font-black text-xs uppercase tracking-widest focus:outline-none focus:bg-white focus:border-gold-400 transition-all cursor-pointer appearance-none shadow-sm hover:shadow-md"
+                            className="w-full pl-4 pr-10 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm font-bold text-gray-700 focus:outline-none focus:ring-2 focus:ring-black/5 focus:border-gray-400 transition-all cursor-pointer appearance-none"
                         >
                             <option value="all">TODOS LOS BARBEROS</option>
                             {staff.filter(s => s.name !== 'Cualquiera').map(s => (
@@ -92,123 +92,115 @@ export default function AdminBookings({ appointments, staff }: AdminBookingsProp
                                 </option>
                             ))}
                         </select>
-                        <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
-                            <Clock className="w-3 h-3 text-gold-500 rotate-90" />
-                        </div>
+                        <Filter className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
                     </div>
                 </div>
             </div>
 
-            {/* Appointments List */}
-            {filteredAppointments.length === 0 ? (
-                <div className="py-20 text-center">
-                    <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-6">
-                        <Calendar className="w-10 h-10 text-gray-200" />
+            {/* List */}
+            <PrivacyGuard label="listado completo">
+                {filteredAppointments.length === 0 ? (
+                    <div className="bg-white rounded-xl p-12 text-center border border-gray-200">
+                        <Calendar className="w-12 h-12 text-gray-200 mx-auto mb-3" />
+                        <p className="text-gray-400 font-bold uppercase tracking-wider text-[10px]">
+                            No hay citas para mostrar
+                        </p>
                     </div>
-                    <p className="text-gray-400 font-black uppercase tracking-widest text-[10px]">
-                        No hay citas registradas {selectedStaff !== 'all' ? 'para este barbero' : ''}
-                    </p>
-                </div>
-            ) : (
-                <div className="space-y-6">
-                    {filteredAppointments.map((apt) => {
-                        const startDate = new Date(apt.start_time)
-                        const endDate = new Date(apt.end_time)
-                        const customerName = apt.customer_name || apt.user_name || 'Cliente'
+                ) : (
+                    <div className="space-y-3">
+                        {filteredAppointments.map((apt) => {
+                            const startDate = new Date(apt.start_time)
+                            const endDate = new Date(apt.end_time)
+                            const customerName = apt.customer_name || apt.user_name || 'Cliente'
 
-                        return (
-                            <div
-                                key={apt.id}
-                                className="bg-white rounded-[2.5rem] p-8 md:p-10 border border-gray-100 shadow-xl shadow-black/[0.03] hover:shadow-black/[0.1] hover:scale-[1.01] transition-all duration-500 group relative overflow-hidden"
-                            >
-                                {/* Background Accent */}
-                                <div className={`absolute top-0 right-0 w-32 h-32 -mr-16 -mt-16 rounded-full opacity-0 group-hover:opacity-10 blur-3xl transition-opacity duration-700 ${apt.status === 'confirmed' ? 'bg-green-500' : 'bg-gold-500'}`}></div>
-
-                                <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8">
-                                    <div className="flex-1 space-y-6">
-                                        {/* Header Row: Profile + Name + Email */}
-                                        <div className="flex items-start gap-5">
-                                            <div className="w-16 h-16 bg-gold-100/50 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-inner group-hover:bg-gold-100 transition-colors duration-500">
-                                                <User className="w-8 h-8 text-gold-600" />
-                                            </div>
-                                            <div className="space-y-1">
-                                                <h3 className="text-3xl font-black tracking-tighter text-gray-900 group-hover:text-gold-600 transition-colors duration-500 leading-none">
-                                                    {customerName}
-                                                </h3>
-                                                <div className="flex items-center gap-2 text-gray-500">
-                                                    <Mail className="w-4 h-4 text-gray-400" />
-                                                    <span className="font-bold text-sm tracking-tight">{apt.customer_email}</span>
+                            return (
+                                <div
+                                    key={apt.id}
+                                    className="bg-white rounded-xl p-4 md:p-5 border border-gray-200 hover:border-gray-300 transition-all shadow-sm flex flex-col lg:flex-row lg:items-center justify-between gap-4"
+                                >
+                                    <div className="flex-1 flex flex-col md:flex-row md:items-center gap-4 md:gap-8">
+                                        {/* Name & Contact */}
+                                        <div className="min-w-[200px]">
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                                                    <User className="w-5 h-5 text-gray-600" />
+                                                </div>
+                                                <div className="overflow-hidden">
+                                                    <h3 className="font-bold text-gray-900 truncate">{customerName}</h3>
+                                                    <div className="flex items-center gap-1.5 text-xs text-gray-500 truncate">
+                                                        <Mail className="w-3 h-3 flex-shrink-0" />
+                                                        <span className="truncate">{apt.customer_email}</span>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
 
-                                        {/* Info Row: Date, Time, Staff */}
-                                        <div className="flex flex-wrap items-center gap-x-8 gap-y-4 pt-2">
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-8 h-8 bg-gray-50 rounded-lg flex items-center justify-center">
-                                                    <Calendar className="w-4 h-4 text-gold-500" />
-                                                </div>
-                                                <span className="font-black text-gray-900 text-sm uppercase tracking-tighter">
-                                                    {format(startDate, "d 'de' MMMM, yyyy", { locale: es })}
+                                        {/* Date & Time */}
+                                        <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm">
+                                            <div className="flex items-center gap-2 text-gray-700">
+                                                <Calendar className="w-4 h-4 text-gray-400" />
+                                                <span className="font-semibold whitespace-nowrap">
+                                                    {format(startDate, "d MMM, yyyy", { locale: es })}
                                                 </span>
                                             </div>
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-8 h-8 bg-gray-50 rounded-lg flex items-center justify-center">
-                                                    <Clock className="w-4 h-4 text-gold-500" />
-                                                </div>
-                                                <span className="font-black text-gray-900 text-sm uppercase tracking-tighter">
+                                            <div className="flex items-center gap-2 text-gray-700">
+                                                <Clock className="w-4 h-4 text-gray-400" />
+                                                <span className="font-semibold whitespace-nowrap">
                                                     {format(startDate, 'HH:mm')} - {format(endDate, 'HH:mm')}
                                                 </span>
                                             </div>
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-8 h-8 bg-gray-50 rounded-lg flex items-center justify-center">
-                                                    <Scissors className="w-4 h-4 text-gold-500" />
-                                                </div>
-                                                <span className="font-black text-gray-900 text-sm uppercase tracking-tighter">
-                                                    {apt.staff_name || 'Sin asignar'}
-                                                </span>
+                                            <div className="flex items-center gap-2 text-gray-700">
+                                                <Scissors className="w-4 h-4 text-gray-400" />
+                                                <span className="font-semibold whitespace-nowrap">{apt.staff_name || 'Sin asignar'}</span>
                                             </div>
                                         </div>
 
                                         {/* Services & Notes */}
-                                        <div className="space-y-3 pt-2">
+                                        <div className="flex-1">
                                             {apt.services && (
-                                                <div className="flex items-baseline gap-3">
-                                                    <span className="text-[10px] font-black uppercase tracking-widest text-gray-400 whitespace-nowrap">Servicios:</span>
-                                                    <span className="font-bold text-gray-900 bg-gray-50 px-3 py-1.5 rounded-xl text-sm border border-gray-100">
-                                                        ["{apt.services}"]
-                                                    </span>
-                                                </div>
+                                                <p className="text-xs text-gray-600 font-medium">
+                                                    <span className="text-gray-400 uppercase text-[10px] font-bold mr-1">Servicios:</span>
+                                                    {(() => {
+                                                        try {
+                                                            const svcs = JSON.parse(apt.services);
+                                                            return Array.isArray(svcs) ? svcs.join(' + ') : svcs;
+                                                        } catch {
+                                                            return apt.services;
+                                                        }
+                                                    })()}
+                                                </p>
                                             )}
                                             {apt.notes && (
-                                                <div className="flex items-baseline gap-3">
-                                                    <span className="text-[10px] font-black uppercase tracking-widest text-gray-400 whitespace-nowrap">Notas:</span>
-                                                    <span className="font-medium text-gray-600 text-sm">
-                                                        {apt.notes}
-                                                    </span>
-                                                </div>
+                                                <p className="text-xs text-gray-500 mt-0.5 line-clamp-1">
+                                                    <span className="text-gray-400 uppercase text-[10px] font-bold mr-1">Nota:</span>
+                                                    {apt.notes}
+                                                </p>
                                             )}
                                         </div>
                                     </div>
 
-                                    {/* Status Badge */}
-                                    <div className="flex lg:flex-col items-center justify-end gap-4 lg:pl-10 lg:border-l border-gray-100">
-                                        <div className={`px-6 py-2.5 rounded-full border-2 text-[10px] font-black uppercase tracking-[0.2em] shadow-sm ${getStatusColor(apt.status)}`}>
+                                    <div className="flex items-center justify-between lg:justify-end gap-3 pt-3 lg:pt-0 border-t lg:border-t-0 border-gray-50">
+                                        <div className={`px-3 py-1.5 rounded-lg border text-[10px] font-bold uppercase tracking-wider ${getStatusColor(apt.status)}`}>
                                             {getStatusLabel(apt.status)}
                                         </div>
                                         <button
-                                            onClick={() => {/* Add functionality to change status or delete */ }}
-                                            className="w-12 h-12 bg-gray-50 text-gray-400 rounded-2xl flex items-center justify-center hover:bg-red-50 hover:text-red-500 transition-all duration-300 shadow-sm"
+                                            onClick={async () => {
+                                                if (confirm('¿Estás seguro de que deseas eliminar esta cita?')) {
+                                                    await cancelAppointment(apt.id);
+                                                }
+                                            }}
+                                            className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors border border-transparent hover:border-red-100"
+                                            title="Eliminar cita"
                                         >
-                                            <Trash2 className="w-5 h-5" />
+                                            <Trash2 className="w-4 h-4" />
                                         </button>
                                     </div>
                                 </div>
-                            </div>
-                        )
-                    })}
-                </div>
-            )}
+                            )
+                        })}
+                    </div>
+                )}
+            </PrivacyGuard>
         </div>
     )
 }

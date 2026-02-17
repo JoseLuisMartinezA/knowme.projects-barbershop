@@ -203,7 +203,7 @@ export async function cancelAppointment(appointmentId: number) {
     }
 
     const userId = payload.userId as number;
-    const isAdmin = payload.email === 'peluqueriapablo.contact@gmail.com';
+    const isAdmin = payload.role === 'admin' || payload.email === 'peluqueriapablo.contact@gmail.com' || payload.email === 'knowme';
 
     try {
         // Find appointment
