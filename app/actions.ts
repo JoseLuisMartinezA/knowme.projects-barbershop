@@ -163,10 +163,17 @@ export async function bookAppointment(formData: FormData): Promise<ActionState> 
             const realStaffIds = realStaffResult.rows.map(r => r.id as number);
 
             let assignedStaffId = null;
+            const tenMinutesAgo = new Date(Date.now() - 10 * 60 * 1000).toISOString();
+
             for (const sId of realStaffIds) {
                 const conflict = await db.execute({
-                    sql: 'SELECT id FROM appointments WHERE staff_id = ? AND start_time = ? AND status != "cancelled"',
-                    args: [sId, startTime.toISOString()]
+                    sql: `
+                        SELECT id FROM appointments 
+                        WHERE staff_id = ? 
+                        AND start_time = ? 
+                        AND (status = 'confirmed' OR (status = 'pending' AND created_at > ?))
+                    `,
+                    args: [sId, startTime.toISOString(), tenMinutesAgo]
                 });
                 if (conflict.rows.length === 0) {
                     assignedStaffId = sId;
@@ -180,9 +187,15 @@ export async function bookAppointment(formData: FormData): Promise<ActionState> 
             staffId = assignedStaffId;
         } else {
             // Check if specifically selected staff is free
+            const tenMinutesAgo = new Date(Date.now() - 10 * 60 * 1000).toISOString();
             const conflict = await db.execute({
-                sql: 'SELECT id FROM appointments WHERE staff_id = ? AND start_time = ? AND status != "cancelled"',
-                args: [staffId, startTime.toISOString()]
+                sql: `
+                    SELECT id FROM appointments 
+                    WHERE staff_id = ? 
+                    AND start_time = ? 
+                    AND (status = 'confirmed' OR (status = 'pending' AND created_at > ?))
+                `,
+                args: [staffId, startTime.toISOString(), tenMinutesAgo]
             });
             if (conflict.rows.length > 0) {
                 return { success: false, error: 'Este profesional ya tiene una cita reservada a esta hora.', message: null };
@@ -190,19 +203,28 @@ export async function bookAppointment(formData: FormData): Promise<ActionState> 
         }
 
         const confirmationToken = generateVerificationToken();
+        const now = new Date().toISOString();
 
         await db.execute({
-            sql: 'INSERT INTO appointments (customer_name, customer_email, staff_id, start_time, end_time, status, services, notes, confirmation_token) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
-            args: [customerName, customerEmail, staffId, startTime.toISOString(), endTime.toISOString(), 'pending', services, notes, confirmationToken]
+            sql: 'INSERT INTO appointments (customer_name, customer_email, staff_id, start_time, end_time, status, services, notes, confirmation_token, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+            args: [customerName, customerEmail, staffId, startTime.toISOString(), endTime.toISOString(), 'pending', services, notes, confirmationToken, now]
         });
 
-        const emailResult = await sendBookingConfirmationEmail(customerEmail, { start_time: startTime }, confirmationToken);
+        const emailResult = await sendBookingConfirmationEmail(customerEmail, {
+            start_time: startTime,
+            services: services,
+            staffName: staffResult.rows[0]?.name
+        }, confirmationToken);
 
         if (!emailResult.success) {
             console.error('Email send failure:', emailResult.error);
         }
 
-        return { success: true, message: '¡Casi listo! Por favor, revisa tu correo para confirmar la cita.', error: null };
+        return {
+            success: true,
+            message: '¡Casi listo! Revisa tu correo para confirmar. Tienes 10 MINUTOS para confirmar o el hueco volverá a quedar libre.',
+            error: null
+        };
     } catch (error) {
         console.error('Booking error:', error);
         return { success: false, error: 'Error al procesar la reserva. Inténtalo de nuevo.', message: null };

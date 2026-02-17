@@ -371,8 +371,14 @@ export default function BookingModal({ isOpen, onClose, service, servicesPool, s
                         <Check className="w-16 h-16 text-white" />
                     </div>
                     <div className="space-y-4">
-                        <h2 className="text-4xl font-black italic tracking-tighter text-white uppercase">{bookingMessage}</h2>
-                        <p className="text-gray-400 font-medium leading-relaxed">Te hemos enviado un enlace de confirmación a tu correo. La reserva se activará en cuanto pulses el enlace.</p>
+                        <h2 className="text-4xl font-black italic tracking-tighter text-white uppercase">¡Casi listo!</h2>
+                        <div className="p-6 bg-white/5 rounded-3xl border border-white/10 space-y-4">
+                            <p className="text-gray-300 font-medium leading-relaxed italic">{bookingMessage}</p>
+                            <div className="flex items-center justify-center gap-2 text-gold-400 animate-pulse">
+                                <Clock className="w-4 h-4" />
+                                <span className="text-[10px] font-black uppercase tracking-[0.2em]">Expiración en 10 minutos</span>
+                            </div>
+                        </div>
                     </div>
                     <button onClick={onClose} className="w-full bg-white text-black py-6 rounded-[2rem] font-black text-xs uppercase tracking-widest hover:scale-105 active:scale-95 transition-all">
                         Entendido

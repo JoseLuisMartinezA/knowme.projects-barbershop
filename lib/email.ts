@@ -148,6 +148,10 @@ export async function sendBookingConfirmationEmail(email: string, bookingDetails
                             <h2 style="margin: 0 0 12px 0; font-size: 24px; font-weight: 900; letter-spacing: -0.02em; text-transform: uppercase; font-style: italic;">¡Casi listo!</h2>
                             <p style="margin: 0; color: #666666; font-size: 15px;">Has solicitado una cita. Por favor, <strong>confírmala</strong> pulsando el botón de abajo para que el barbero la reciba.</p>
                             
+                            <div style="margin-top: 20px; padding: 16px; background: #fff1f2; border: 1px solid #fecdd3; border-radius: 16px; color: #e11d48; font-size: 12px; font-weight: 800; text-align: center; text-transform: uppercase; letter-spacing: 0.1em;">
+                                ⚠️ Tienes 10 minutos para confirmar o la cita caducará.
+                            </div>
+                            
                             <div style="${INFO_BOX_STYLE}">
                                 <div style="${LABEL_STYLE}">FECHA Y HORA</div>
                                 <div style="${VALUE_STYLE}">
@@ -158,7 +162,14 @@ export async function sendBookingConfirmationEmail(email: string, bookingDetails
 
                                 <div style="${LABEL_STYLE}">SERVICIOS</div>
                                 <div style="font-size: 14px; font-weight: 700; color: #111111; margin-bottom: 20px;">
-                                    ["${bookingDetails.services}"]
+                                    ${(() => {
+                    try {
+                        const svcs = JSON.parse(bookingDetails.services);
+                        return Array.isArray(svcs) ? svcs.join(' + ') : svcs;
+                    } catch {
+                        return bookingDetails.services || 'No especificado';
+                    }
+                })()}
                                 </div>
 
                                 <div style="${LABEL_STYLE}">BARBERO</div>

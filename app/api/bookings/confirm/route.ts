@@ -13,15 +13,17 @@ export async function GET(request: Request) {
 
 
 
+    const tenMinutesAgo = new Date(Date.now() - 10 * 60 * 1000).toISOString();
+
     // Find appointment with staff info
     const result = await db.execute({
         sql: `
       SELECT a.*, s.name as staff_name
       FROM appointments a
       LEFT JOIN staff s ON a.staff_id = s.id
-      WHERE a.confirmation_token = ?
+      WHERE a.confirmation_token = ? AND a.created_at > ?
     `,
-        args: [token],
+        args: [token, tenMinutesAgo],
     });
 
     if (result.rows.length === 0) {

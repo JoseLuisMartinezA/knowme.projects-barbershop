@@ -23,13 +23,25 @@ export async function getAvailableSlots(dateStr: string, staffId?: string | numb
     const googleEvents = await listEvents(timeMin, timeMax);
 
     // 2. Get Turso Appointments
+    // A slot is taken if:
+    // - It is 'confirmed'
+    // - OR it is 'pending' AND was created less than 10 minutes ago
+    const tenMinutesAgo = new Date(Date.now() - 10 * 60 * 1000).toISOString();
+
+    // We use a range check for start_time to be exactly on the requested day
+    const dayStartISO = `${dateStr}T00:00:00.000Z`;
+    const dayEndISO = `${dateStr}T23:59:59.999Z`;
+
     const tursoResult = await db.execute({
         sql: `
-        SELECT start_time, end_time, staff_id FROM appointments 
-        WHERE status IN ('pending', 'confirmed')
-        AND date(start_time) = ?
+        SELECT start_time, end_time, staff_id, status, created_at FROM appointments 
+        WHERE (
+            status = 'confirmed' 
+            OR (status = 'pending' AND created_at > ?)
+        )
+        AND start_time >= ? AND start_time <= ?
     `,
-        args: [dateStr]
+        args: [tenMinutesAgo, dayStartISO, dayEndISO]
     });
 
     // 3. Get All Real Staff (needed if staffId is not specified or "all")
